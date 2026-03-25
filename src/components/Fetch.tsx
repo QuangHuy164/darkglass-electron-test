@@ -1,5 +1,6 @@
 /* eslint-disable prettier/prettier */
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface ShopifyProps {
   id: string;
@@ -31,43 +32,54 @@ function Fetch() {
   const [products, setProducts] = useState<ProductEdgeProps[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [search, setSearch] = useState<string>('');
+  const [hasFetched, setHasFetched] = useState<boolean>(false);
+  const navigate = useNavigate()
 
-  const onFetch = async (): Promise<void> => {
+  const fetchProductsFromBackend = useCallback(async (searchProducts: string) => {
     setIsLoading(true);
     try {
-      const fetchProducts = await fetch(
-        ' http://localhost:3000',
+      const response = await fetch(
+        `http://localhost:3000?search=${encodeURIComponent(searchProducts)}`,
       );
 
-      const response: ApiResponse = await fetchProducts.json();
+      const responseData: ApiResponse = await response.json();
 
-      if (response.data.edges) {
-        setProducts(response.data.edges);
-      }
+      if (responseData?.data?.edges) {
+        setProducts(responseData.data.edges || []);
+      } 
+      setHasFetched(true)
     } catch (error) {
       console.log('Error while fetching', error)
     } finally {
       setIsLoading(false);
     }
+  },[]);
+
+  const onFetch = () => {
+    fetchProductsFromBackend(search)
   };
 
-  const filteredProducts = products.filter(({ node }) => {
-    const query = search.toLowerCase();
-    const filteredTitle = node.title.toLowerCase().includes(query);
+ useEffect(() => {
+  if (!hasFetched) return
+  const debounceTime = setTimeout(() => {
+    fetchProductsFromBackend(search);
+  }, 500)
 
-    const sku = node.variants?.edges?.[0].node.sku || ''
-    const filteredSku = sku.toLowerCase().includes(query);
+  // eslint-disable-next-line consistent-return
+  return () => {
+    clearTimeout(debounceTime); // remove old timer if users filter be4 500
+  };
+}, [search, hasFetched, fetchProductsFromBackend]);
 
-    const price = node.variants?.edges?.[0].node.price.amount || ''
-    const filteredPrice = price.includes(query)
-    return filteredTitle || filteredSku || filteredPrice;
-  });
+const returnBtn = () => {
+  navigate('/')
+}
 
   return (
-    <div>
-      <h2>Shopify Products</h2>
-
-      <div style={{ display: 'flex', marginBottom: '20px' }}>
+    <div style={{height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden'}}>
+      <header style={{padding: '20px 40px', borderBottom: '1px', flexShrink: 0}}>
+        <h2>Shopify Products</h2>
+      <div style={{ display: 'flex', gap: '20px' }}>
         <button
           type="button"
           onClick={onFetch}
@@ -76,6 +88,7 @@ function Fetch() {
         >
           {isLoading ? 'Loading...' : 'Fetch Products'}
         </button>
+
       {!isLoading && products.length > 0 && (<input
         style={{padding: '10px', marginLeft: '40px'}}
           type="text"
@@ -84,11 +97,12 @@ function Fetch() {
           onChange={(e) => setSearch(e.target.value)}
         />
         )}
-        
+      {/* <button type='button' onClick={returnBtn}>Return</button> */}
       </div>
+      </header>
 
+      <main style={{flex: 1, overflowY: 'auto', padding: '20px', display: 'flex',flexDirection: 'column'}}>
       {isLoading && <p>Connecting Node.js server...</p>}
-
       {!isLoading && products.length > 0 && (
         <table>
           <thead>
@@ -99,18 +113,18 @@ function Fetch() {
             </tr>
           </thead>
           <tbody>
-            {filteredProducts.map(({ node }) => {
+            {products.map(({ node }) => {
               const firstVariant = node.variants?.edges?.[0].node;
               return (
               <tr key={node.id}>
                 <td style={{padding: '10px'}}>{node.title}</td>
-                <td style={{padding: '10px'}}>{firstVariant?.sku}</td>
+                <td style={{padding: '10px'}}>{firstVariant?.sku || 'null'}</td>
                 <td style={{padding: '10px'}}>{firstVariant?.price.amount}</td>
               </tr>
             )})}
           </tbody>
         </table>
-      )}
+      )}</main>
     </div>
   );
 }
