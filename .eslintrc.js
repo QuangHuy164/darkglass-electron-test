@@ -28,7 +28,10 @@ module.exports = {
       webpack: {
         config: require.resolve('./.erb/configs/webpack.config.eslint.ts'),
       },
-      typescript: {},
+      typescript: {
+        alwaysTryType: true,
+        project: './tsconfig.json',
+      },
     },
     'import/parsers': {
       '@typescript-eslint/parser': ['.ts', '.tsx'],

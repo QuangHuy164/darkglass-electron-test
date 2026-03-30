@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-interface BlockItemProps {
+interface BlockProps {
   id: number;
   name: string;
   color: string;
@@ -10,36 +10,35 @@ interface BlockItemProps {
 
 function DragDrop() {
   const navigate = useNavigate();
-  const [items, setItems] = useState<BlockItemProps[]>([
+  const [blocks, setBlocks] = useState<BlockProps[]>([
     { id: 1, name: 'Blue Block', color: '#124ceb' },
     { id: 2, name: 'Red Block', color: '#e20b0b' },
     { id: 3, name: 'Yellow Block', color: '#caeb0e' },
     { id: 4, name: 'Green Block', color: '#08bd08' },
     { id: 5, name: 'Purple Block', color: '#da0bec' },
   ]);
-  const [draggedItemIndex, setDraggedItemIndex] = useState<number | null>(null);
+  const [draggedBlockIndex, setDraggedBlockIndex] = useState<number | null>(null);
   function handleDragStart(index: number) {
-    setDraggedItemIndex(index);
+    setDraggedBlockIndex(index);
   }
-  function handleDragEnter(targetIndex: number) {
-    if (draggedItemIndex === null || draggedItemIndex === targetIndex) {
+  function handleDragEnter(index: number) {
+    if (draggedBlockIndex === null || draggedBlockIndex === index) {
       return;
     }
-    const newList = [...items];
+    const newList = [...blocks];
     // get the item
-    const itemBeingMoved = newList[draggedItemIndex];
+    const blockToMove = newList[draggedBlockIndex];
     // remove from old pos
-    newList.splice(draggedItemIndex, 1);
+    newList.splice(draggedBlockIndex, 1);
     // put in new position
-    newList.splice(targetIndex, 0, itemBeingMoved);
-    // update index let React knows where the item is
-    setDraggedItemIndex(targetIndex);
-    // update state
-    setItems(newList);
+    newList.splice(index, 0, blockToMove);
+    // update state and index
+    setDraggedBlockIndex(index);
+    setBlocks(newList);
   }
 
   function handleDragEnd() {
-    setDraggedItemIndex(null);
+    setDraggedBlockIndex(null);
   }
   function handleDragOver(e: React.DragEvent) {
     e.preventDefault();
@@ -47,10 +46,13 @@ function DragDrop() {
   return (
     <div>
       <h2>Drag and Drop control</h2>
-      <div>
-        {items.map((item, index) => (
+      <div style={{
+        display: 'flex',
+        flexDirection: 'row',
+      }}>
+        {blocks.map((block, index) => (
           <div
-            key={item.id}
+            key={block.id}
             draggable
             onDragStart={() => handleDragStart(index)}
             onDragEnter={() => handleDragEnter(index)}
@@ -62,11 +64,13 @@ function DragDrop() {
               display: 'flex',
               alignItems:'center',
               justifyContent: 'center',
-              backgroundColor: item.color,
+              backgroundColor: block.color,
               margin: '20px',
+              cursor: 'move',
+            
             }}
           >
-            <span>{item.name}</span>
+            <span>{block.name}</span>
           </div>
         ))}
       </div>

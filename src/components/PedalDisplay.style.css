@@ -1,0 +1,65 @@
+.pedal-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px;
+  min-height: 100vh;
+  overflow-y: auto;
+}
+
+#pedal-container {
+  position: relative;
+  width: 748px;
+  margin: 0 auto;
+}
+
+.chasis-image {
+  width: 100%;
+  display: block;
+
+}
+
+.component {
+  position: absolute;
+  transform: translate(-50%, -50%);
+}
+
+.interactable {
+  cursor: pointer;
+}
+
+.interactable:hover,
+.interactable:active,
+.interactable:focus {
+  transform: translate(-50%, -50%);
+}
+
+button.component {
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  display: block;
+}
+
+.component img {
+  width: 100%;
+  display: block;
+}
+
+
+.knob { width: 18.9%; }
+.push-button { width: 13.4%; }
+.led { width: 11.9%; }
+.actuator { width: 16.6%; }
+
+.blend-knob { top: 19%; left: 33%; }
+.mod-knob   { top: 19%; left: 67%; }
+.level-knob { top: 37%; left: 33%; }
+.drive-knob { top: 37%; left: 67%; }
+
+.growl-btn  { top: 56%; left: 33%; }
+.bite-btn   { top: 56%; left: 67%; }
+
+.led-light     { top: 50%; left: 50%; }
+.main-actuator { top: 85%; left: 50%; }
