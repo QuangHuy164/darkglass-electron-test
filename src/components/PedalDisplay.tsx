@@ -35,7 +35,6 @@ function ToggleButton({
       type="button"
       className={`component interactable ${className}`}
       onClick={onToggle}
-      aria-pressed={isOn}
       aria-label={ariaLabel}
     >
       <img src={isOn ? onImg : offImg} alt="" />
@@ -117,7 +116,7 @@ function PedalDisplay() {
         <img
           src={isMainOn ? LedOnImg : LedOffImg}
           className="component led led-light"
-          alt={`Pedal Status: ${isMainOn ? 'On' : 'Off'}`}
+          alt={`${isMainOn ? 'On' : 'Off'}`}
         />
 
         <ToggleButton
