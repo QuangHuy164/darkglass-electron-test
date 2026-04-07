@@ -31,6 +31,7 @@ interface ApiResponse {
 function Fetch() {
   const [products, setProducts] = useState<ProductEdgeProps[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null)
   const [search, setSearch] = useState<string>('');
   const [hasFetched, setHasFetched] = useState<boolean>(false);
   const navigate = useNavigate();
@@ -49,8 +50,9 @@ function Fetch() {
           setProducts(responseData.data.edges || []);
         }
         setHasFetched(true);
-      } catch (error) {
-        console.log('Error while fetching', error);
+      } catch (err) {
+        setProducts([])
+        setError(err instanceof Error ? err.message : 'No Results' )
       } finally {
         setIsLoading(false);
       }
