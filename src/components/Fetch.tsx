@@ -76,6 +76,7 @@ function Fetch() {
     };
   }, [search, hasFetched, fetchProductsFromBackend]);
 
+
   const returnBtn = () => {
     navigate('/');
   };
@@ -103,7 +104,7 @@ function Fetch() {
               {isLoading ? 'Loading...' : 'Fetch Products'}
             </button>
     
-          {!isLoading && products.length > 0 && (
+          {hasFetched && (
             <input
               style={{ padding: '10px', marginLeft: '40px' }}
               type="text"
@@ -128,6 +129,11 @@ function Fetch() {
         }}
       >
         {isLoading && <p>Connecting Node.js server...</p>}
+
+        {!isLoading && hasFetched && products.length === 0 && !error && (
+          <p>No products found</p>
+        )}
+
         {!isLoading && products.length > 0 && (
           <table>
             <thead>
